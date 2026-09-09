@@ -138,7 +138,7 @@ export function AppProvider({
       try {
         await saveUserData(data);
       } catch (err) {
-        setSyncError(err instanceof Error ? err.message : 'Error al guardar en R2');
+        setSyncError(err instanceof Error ? err.message : 'Error al guardar en D1');
       } finally {
         setSyncing(false);
       }
@@ -377,7 +377,7 @@ export function AppProvider({
   if (!ready) {
     return (
       <div className="boot-screen">
-        <p>Cargando tus paneles desde R2…</p>
+        <p>Cargando tus paneles desde D1…</p>
       </div>
     );
   }

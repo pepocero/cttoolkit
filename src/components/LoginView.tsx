@@ -61,7 +61,7 @@ export function LoginView({ initialMode = 'login', onBack }: LoginViewProps) {
             </span>
             <div>
               <h1>CT Toolkit</h1>
-              <p className="text-muted">Accede a tus paneles en la nube (Cloudflare R2)</p>
+              <p className="text-muted">Accede a tus paneles en la nube (Cloudflare D1 + JWT)</p>
             </div>
           </button>
         </div>
@@ -125,7 +125,7 @@ export function LoginView({ initialMode = 'login', onBack }: LoginViewProps) {
 
         <p className="auth-note text-muted">
           Cada usuario solo ve y gestiona sus propios paneles. Los datos se guardan de forma
-          aislada en Cloudflare R2.
+          aislada en Cloudflare D1.
         </p>
       </div>
     </div>

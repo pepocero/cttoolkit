@@ -165,7 +165,7 @@ export function LandingPage({ onLogin, onRegister }: LandingPageProps) {
               <Lock size={22} />
               <div>
                 <h3>Privado por usuario</h3>
-                <p>Login propio: solo ves y gestionas tus paneles en Cloudflare R2.</p>
+                <p>Login propio: solo ves y gestionas tus paneles en Cloudflare D1.</p>
               </div>
             </li>
           </ul>

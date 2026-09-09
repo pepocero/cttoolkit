@@ -3,9 +3,9 @@ import {
   hashPassword,
   isValidEmail,
   normalizeEmail,
-  signSession,
+  signJwt,
+  verifyJwt,
   verifyPassword,
-  verifySession,
 } from './crypto';
 import { error, json, readJson } from './http';
 import { ensureSeedUser, initialDataForEmail } from './seed';
@@ -14,51 +14,54 @@ import {
   clearSessionCookie,
   createUser,
   findUserIdByEmail,
-  getAccount,
+  getAccountByEmail,
   getUserData,
   isValidAppData,
   readSessionToken,
   saveUserData,
   sessionCookie,
 } from './store';
-import type { Env, SessionPayload } from './types';
+import type { Env, JwtPayload } from './types';
 
 interface AuthBody {
   email?: string;
   password?: string;
 }
 
-async function requireSession(
+async function requireJwt(
   request: Request,
   env: Env,
-): Promise<{ session: SessionPayload } | Response> {
+): Promise<{ jwt: JwtPayload } | Response> {
   const token = readSessionToken(request);
   if (!token) return error('No autenticado', 401);
   if (!env.AUTH_SECRET) return error('AUTH_SECRET no configurado', 500);
 
-  const session = await verifySession(token, env.AUTH_SECRET);
-  if (!session) return error('Sesión inválida o caducada', 401);
-  return { session };
+  const jwt = await verifyJwt(token, env.AUTH_SECRET);
+  if (!jwt) return error('JWT inválido o caducado', 401);
+  return { jwt };
 }
 
-function publicUser(session: SessionPayload) {
-  return { id: session.sub, email: session.email };
+function publicUser(jwt: JwtPayload) {
+  return { id: jwt.sub, email: jwt.email };
 }
 
-async function issueSession(
+async function issueJwt(
   request: Request,
   env: Env,
   userId: string,
   email: string,
 ): Promise<Response> {
-  const exp = Math.floor(Date.now() / 1000) + SESSION_DAYS * 24 * 60 * 60;
-  const token = await signSession({ sub: userId, email, exp }, env.AUTH_SECRET);
+  const iat = Math.floor(Date.now() / 1000);
+  const exp = iat + SESSION_DAYS * 24 * 60 * 60;
+  const token = await signJwt({ sub: userId, email, iat, exp }, env.AUTH_SECRET);
   const headers = new Headers({
     'Set-Cookie': sessionCookie(token, request.url),
   });
   return json(
     {
       user: { id: userId, email },
+      token,
+      tokenType: 'Bearer',
       expiresAt: new Date(exp * 1000).toISOString(),
     },
     { headers },
@@ -73,7 +76,7 @@ export async function handleApi(request: Request, env: Env): Promise<Response> {
   const method = request.method.toUpperCase();
 
   if (method === 'GET' && path === '/api/health') {
-    return json({ ok: true, service: 'ct-toolkit' });
+    return json({ ok: true, service: 'ct-toolkit', storage: 'd1', auth: 'jwt' });
   }
 
   if (method === 'POST' && path === '/api/auth/register') {
@@ -115,7 +118,7 @@ export async function handleApi(request: Request, env: Env): Promise<Response> {
       throw err;
     }
 
-    return issueSession(request, env, userId, email);
+    return issueJwt(request, env, userId, email);
   }
 
   if (method === 'POST' && path === '/api/auth/login') {
@@ -127,16 +130,13 @@ export async function handleApi(request: Request, env: Env): Promise<Response> {
       return error('Email o contraseña incorrectos', 401);
     }
 
-    const userId = await findUserIdByEmail(env, email);
-    if (!userId) return error('Email o contraseña incorrectos', 401);
-
-    const account = await getAccount(env, userId);
+    const account = await getAccountByEmail(env, email);
     if (!account) return error('Email o contraseña incorrectos', 401);
 
     const ok = await verifyPassword(password, account.passwordSalt, account.passwordHash);
     if (!ok) return error('Email o contraseña incorrectos', 401);
 
-    return issueSession(request, env, account.id, account.email);
+    return issueJwt(request, env, account.id, account.email);
   }
 
   if (method === 'POST' && path === '/api/auth/logout') {
@@ -147,16 +147,16 @@ export async function handleApi(request: Request, env: Env): Promise<Response> {
   }
 
   if (method === 'GET' && path === '/api/auth/me') {
-    const result = await requireSession(request, env);
+    const result = await requireJwt(request, env);
     if (result instanceof Response) return result;
-    return json({ user: publicUser(result.session) });
+    return json({ user: publicUser(result.jwt) });
   }
 
   if (method === 'GET' && path === '/api/data') {
-    const result = await requireSession(request, env);
+    const result = await requireJwt(request, env);
     if (result instanceof Response) return result;
 
-    const data = await getUserData(env, result.session.sub);
+    const data = await getUserData(env, result.jwt.sub);
     if (!data) {
       return json({ version: 1, panels: [] });
     }
@@ -164,7 +164,7 @@ export async function handleApi(request: Request, env: Env): Promise<Response> {
   }
 
   if (method === 'PUT' && path === '/api/data') {
-    const result = await requireSession(request, env);
+    const result = await requireJwt(request, env);
     if (result instanceof Response) return result;
 
     const body = await readJson<unknown>(request);
@@ -177,7 +177,7 @@ export async function handleApi(request: Request, env: Env): Promise<Response> {
       panels: body.panels,
     };
 
-    await saveUserData(env, result.session.sub, payload);
+    await saveUserData(env, result.jwt.sub, payload);
     return json({ ok: true, updatedAt: new Date().toISOString() });
   }
 

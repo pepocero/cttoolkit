@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "dev:api": "wrangler dev --port 8787",
-    "dev:all": "wrangler dev --port 8787",
+    "db:migrate:local": "wrangler d1 migrations apply ct-toolkit --local",
+    "db:migrate:remote": "wrangler d1 migrations apply ct-toolkit --remote",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",

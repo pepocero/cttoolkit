@@ -48,7 +48,7 @@ export function BackupManager() {
       <div>
         <h2>Copia de seguridad</h2>
         <p className="text-muted">
-          Tus paneles se guardan en Cloudflare R2, aislados por usuario. Exporta o importa JSON
+          Tus paneles se guardan en Cloudflare D1, aislados por usuario. Exporta o importa JSON
           como copia de seguridad adicional.
         </p>
       </div>

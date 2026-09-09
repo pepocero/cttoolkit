@@ -1,5 +1,5 @@
 export interface Env {
-  DATA_BUCKET: R2Bucket;
+  DB: D1Database;
   ASSETS: Fetcher;
   AUTH_SECRET: string;
   SEED_USER_EMAIL: string;
@@ -16,14 +16,10 @@ export interface UserAccount {
   updatedAt: string;
 }
 
-export interface EmailIndex {
-  userId: string;
-  email: string;
-}
-
-export interface SessionPayload {
+export interface JwtPayload {
   sub: string;
   email: string;
+  iat: number;
   exp: number;
 }
 

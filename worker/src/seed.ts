@@ -1,14 +1,12 @@
 import seedData from './seedData.json' with { type: 'json' };
 import { createId, hashPassword, normalizeEmail } from './crypto';
 import {
-  accountKey,
   createUser,
-  dataKey,
   emptyAppData,
   findUserIdByEmail,
-  getAccount,
   getUserData,
-  putJson,
+  saveUserData,
+  updateAccountPassword,
 } from './store';
 import type { AppDataRecord, Env, UserAccount } from './types';
 
@@ -32,21 +30,11 @@ export async function ensureSeedUser(env: Env): Promise<void> {
       if (existingId) {
         const data = await getUserData(env, existingId);
         if (!data) {
-          await putJson(env.DATA_BUCKET, dataKey(existingId), cloneSeedData());
+          await saveUserData(env, existingId, cloneSeedData());
         }
 
-        // Mantener la contraseña del usuario semilla alineada con SEED_USER_PASSWORD
-        const account = await getAccount(env, existingId);
-        if (account) {
-          const { hash, salt } = await hashPassword(password);
-          const updated: UserAccount = {
-            ...account,
-            passwordHash: hash,
-            passwordSalt: salt,
-            updatedAt: new Date().toISOString(),
-          };
-          await putJson(env.DATA_BUCKET, accountKey(existingId), updated);
-        }
+        const { hash, salt } = await hashPassword(password);
+        await updateAccountPassword(env, existingId, hash, salt);
         return;
       }
 
@@ -62,7 +50,7 @@ export async function ensureSeedUser(env: Env): Promise<void> {
       };
 
       await createUser(env, account, cloneSeedData());
-      console.log(`Usuario semilla creado: ${email}`);
+      console.log(`Usuario semilla creado en D1: ${email}`);
     })();
   }
 

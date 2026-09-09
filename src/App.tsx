@@ -25,7 +25,7 @@ function SyncBadge() {
   if (syncing) {
     return (
       <span className="sync-badge">
-        <Cloud size={14} /> Guardando en R2…
+        <Cloud size={14} /> Guardando en D1…
       </span>
     );
   }

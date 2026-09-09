@@ -48,7 +48,7 @@ URL, ruta de red, Windows, CMD, PowerShell o personalizado.
 Encuentra cualquier valor y marca lo que usas cada día.
 
 ### Privado por usuario
-Login propio: solo ves y gestionas tus paneles en Cloudflare R2.
+Login propio: solo ves y gestionas tus paneles en Cloudflare D1.
 
 ---
 
@@ -87,12 +87,13 @@ Entra, abre tus paneles y sigue trabajando. Tus datos viajan contigo, no en un b
 ```bash
 npm install
 cp .dev.vars.example .dev.vars
+npm run db:migrate:local
 ```
 
 Edita `.dev.vars` (`AUTH_SECRET`, `SEED_USER_PASSWORD`).
 
 ```bash
-# Terminal 1 — API + R2 local
+# Terminal 1 — API + D1 local
 npm run dev:api
 
 # Terminal 2 — Frontend
@@ -101,22 +102,25 @@ npm run dev
 
 Abre `http://localhost:5173`.
 
-## Despliegue (Cloudflare Worker + R2)
+## Despliegue (Cloudflare Worker + D1)
 
 ```bash
-npx wrangler r2 bucket create ct-toolkit-data
+npx wrangler d1 create ct-toolkit
+# Sustituye database_id en wrangler.jsonc
+
 npx wrangler secret put AUTH_SECRET
 npx wrangler secret put SEED_USER_PASSWORD
+npm run db:migrate:remote
 npm run deploy
 ```
 
-Más detalle en [`docs/AUTH_R2.md`](docs/AUTH_R2.md).
+Más detalle en [`docs/AUTH_D1.md`](docs/AUTH_D1.md).
 
 ## Documentación
 
 | Documento | Contenido |
 |-----------|-----------|
-| [docs/AUTH_R2.md](docs/AUTH_R2.md) | Auth + R2 + API |
+| [docs/AUTH_D1.md](docs/AUTH_D1.md) | Auth JWT + D1 + API |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Arquitectura |
 | [docs/DATA_STRUCTURE.md](docs/DATA_STRUCTURE.md) | JSON de paneles/acciones |
 | [docs/BAT_GENERATION.md](docs/BAT_GENERATION.md) | Generación de BAT |

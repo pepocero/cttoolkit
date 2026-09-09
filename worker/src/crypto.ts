@@ -1,4 +1,7 @@
-function toBase64Url(bytes: ArrayBuffer | Uint8Array): string {
+function toBase64Url(bytes: ArrayBuffer | Uint8Array | string): string {
+  if (typeof bytes === 'string') {
+    return btoa(bytes).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+  }
   const view = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
   let binary = '';
   for (const byte of view) binary += String.fromCharCode(byte);
@@ -71,41 +74,74 @@ async function importHmacKey(secret: string): Promise<CryptoKey> {
   );
 }
 
-export async function signSession(
-  payload: { sub: string; email: string; exp: number },
+/** Emite un JWT HS256 estándar (header.payload.signature). */
+export async function signJwt(
+  payload: { sub: string; email: string; exp: number; iat?: number },
   secret: string,
 ): Promise<string> {
-  const body = toBase64Url(new TextEncoder().encode(JSON.stringify(payload)));
-  const key = await importHmacKey(secret);
-  const signature = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(body));
-  return `${body}.${toBase64Url(signature)}`;
-}
+  const header = { alg: 'HS256', typ: 'JWT' };
+  const body = {
+    sub: payload.sub,
+    email: payload.email,
+    iat: payload.iat ?? Math.floor(Date.now() / 1000),
+    exp: payload.exp,
+  };
 
-export async function verifySession(
-  token: string,
-  secret: string,
-): Promise<{ sub: string; email: string; exp: number } | null> {
-  const [body, signature] = token.split('.');
-  if (!body || !signature) return null;
+  const encodedHeader = toBase64Url(JSON.stringify(header));
+  const encodedPayload = toBase64Url(JSON.stringify(body));
+  const signingInput = `${encodedHeader}.${encodedPayload}`;
 
   const key = await importHmacKey(secret);
-  const valid = await crypto.subtle.verify(
+  const signature = await crypto.subtle.sign(
     'HMAC',
     key,
-    fromBase64Url(signature),
-    new TextEncoder().encode(body),
+    new TextEncoder().encode(signingInput),
   );
-  if (!valid) return null;
+
+  return `${signingInput}.${toBase64Url(signature)}`;
+}
+
+/** Verifica y decodifica un JWT HS256. */
+export async function verifyJwt(
+  token: string,
+  secret: string,
+): Promise<{ sub: string; email: string; iat: number; exp: number } | null> {
+  const parts = token.split('.');
+  if (parts.length !== 3) return null;
+  const [encodedHeader, encodedPayload, encodedSignature] = parts;
 
   try {
-    const payload = JSON.parse(new TextDecoder().decode(fromBase64Url(body))) as {
-      sub: string;
-      email: string;
-      exp: number;
+    const header = JSON.parse(new TextDecoder().decode(fromBase64Url(encodedHeader))) as {
+      alg?: string;
+      typ?: string;
     };
+    if (header.alg !== 'HS256') return null;
+
+    const key = await importHmacKey(secret);
+    const valid = await crypto.subtle.verify(
+      'HMAC',
+      key,
+      fromBase64Url(encodedSignature),
+      new TextEncoder().encode(`${encodedHeader}.${encodedPayload}`),
+    );
+    if (!valid) return null;
+
+    const payload = JSON.parse(new TextDecoder().decode(fromBase64Url(encodedPayload))) as {
+      sub?: string;
+      email?: string;
+      iat?: number;
+      exp?: number;
+    };
+
     if (!payload.sub || !payload.email || typeof payload.exp !== 'number') return null;
     if (payload.exp * 1000 < Date.now()) return null;
-    return payload;
+
+    return {
+      sub: payload.sub,
+      email: payload.email,
+      iat: typeof payload.iat === 'number' ? payload.iat : 0,
+      exp: payload.exp,
+    };
   } catch {
     return null;
   }

@@ -9,11 +9,12 @@
     "binding": "ASSETS",
     "run_worker_first": ["/api/*"]
   },
-  "r2_buckets": [
+  "d1_databases": [
     {
-      "binding": "DATA_BUCKET",
-      "bucket_name": "ct-toolkit-data",
-      "preview_bucket_name": "ct-toolkit-data-preview"
+      "binding": "DB",
+      "database_name": "ct-toolkit",
+      "database_id": "00000000-0000-4000-8000-000000000001",
+      "migrations_dir": "migrations"
     }
   ],
   "vars": {

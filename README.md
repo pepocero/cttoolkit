@@ -64,7 +64,7 @@ Login propio: solo ves y gestionas tus paneles en Cloudflare R2.
     <td align="center" width="33%">
       <img src="public/landing/step-2.png" alt="Añadir acciones" /><br />
       <strong>2. Añade acciones</strong><br />
-      Nombre, tipo y valor (URL, ruta o comando).
+      Nombre, tipo y valor. Por ejemplo: «Adaptadores de red» → <code>ncpa.cpl</code>, o «Servidor de archivos» → <code>\\fs-oficina\datos</code>.
     </td>
     <td align="center" width="33%">
       <img src="public/landing/step-3.png" alt="Usar acciones" /><br />

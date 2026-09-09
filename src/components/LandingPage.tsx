@@ -195,7 +195,10 @@ export function LandingPage({ onLogin, onRegister }: LandingPageProps) {
             </figure>
             <span>2</span>
             <h3>Añade acciones</h3>
-            <p>Nombre, tipo y valor (URL, ruta o comando).</p>
+            <p>
+              Por ejemplo: «Adaptadores de red» → <code>ncpa.cpl</code>, o «Servidor de
+              archivos» → <code>\\fs-oficina\datos</code>.
+            </p>
           </li>
           <li>
             <figure className="landing-steps__media">

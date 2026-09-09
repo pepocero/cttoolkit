@@ -13,7 +13,7 @@
     {
       "binding": "DB",
       "database_name": "ct-toolkit",
-      "database_id": "00000000-0000-4000-8000-000000000001",
+      "database_id": "19cc0ce0-edd3-4e9e-9c4b-3db83332ff35",
       "migrations_dir": "migrations"
     }
   ],

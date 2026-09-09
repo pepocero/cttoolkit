@@ -1,0 +1,23 @@
+{
+  "name": "ct-toolkit",
+  "main": "worker/src/index.ts",
+  "compatibility_date": "2026-09-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "single-page-application",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"]
+  },
+  "r2_buckets": [
+    {
+      "binding": "DATA_BUCKET",
+      "bucket_name": "ct-toolkit-data",
+      "preview_bucket_name": "ct-toolkit-data-preview"
+    }
+  ],
+  "vars": {
+    "SEED_USER_EMAIL": "pepocero@gmail.com",
+    "ALLOW_REGISTRATION": "true"
+  }
+}

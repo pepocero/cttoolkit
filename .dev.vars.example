@@ -1,0 +1,2 @@
+AUTH_SECRET=generate-a-long-random-secret-at-least-32-chars
+SEED_USER_PASSWORD=elige-una-contraseña-segura

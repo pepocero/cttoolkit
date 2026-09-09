@@ -184,7 +184,7 @@ export function LandingPage({ onLogin, onRegister }: LandingPageProps) {
             </figure>
             <span>1</span>
             <h3>Crea un panel</h3>
-            <p>Por ejemplo «Ordenadores del SOC».</p>
+            <p>Por ejemplo «Herramientas de red».</p>
           </li>
           <li>
             <figure className="landing-steps__media">

@@ -59,7 +59,7 @@ Login propio: solo ves y gestionas tus paneles en Cloudflare R2.
     <td align="center" width="33%">
       <img src="public/landing/step-1.png" alt="Crear un panel" /><br />
       <strong>1. Crea un panel</strong><br />
-      Por ejemplo «Ordenadores del SOC».
+      Por ejemplo «Herramientas de red».
     </td>
     <td align="center" width="33%">
       <img src="public/landing/step-2.png" alt="Añadir acciones" /><br />

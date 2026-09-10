@@ -2,7 +2,6 @@ import seedData from './seedData.json' with { type: 'json' };
 import { createId, hashPassword, normalizeEmail } from './crypto';
 import {
   createUser,
-  emptyAppData,
   findUserIdByEmail,
   getUserData,
   saveUserData,
@@ -12,7 +11,8 @@ import type { AppDataRecord, Env, UserAccount } from './types';
 
 let seedPromise: Promise<void> | null = null;
 
-function cloneSeedData(): AppDataRecord {
+/** Panel de muestra para usuarios nuevos (red de pequeña empresa). */
+export function getSampleUserData(): AppDataRecord {
   return structuredClone(seedData) as AppDataRecord;
 }
 
@@ -30,7 +30,7 @@ export async function ensureSeedUser(env: Env): Promise<void> {
       if (existingId) {
         const data = await getUserData(env, existingId);
         if (!data) {
-          await saveUserData(env, existingId, cloneSeedData());
+          await saveUserData(env, existingId, getSampleUserData());
         }
 
         const { hash, salt } = await hashPassword(password);
@@ -49,7 +49,7 @@ export async function ensureSeedUser(env: Env): Promise<void> {
         updatedAt: now,
       };
 
-      await createUser(env, account, cloneSeedData());
+      await createUser(env, account, getSampleUserData());
       console.log(`Usuario semilla creado en D1: ${email}`);
     })();
   }
@@ -62,9 +62,7 @@ export async function ensureSeedUser(env: Env): Promise<void> {
   }
 }
 
-export function initialDataForEmail(email: string, seedEmail: string): AppDataRecord {
-  if (normalizeEmail(email) === normalizeEmail(seedEmail)) {
-    return cloneSeedData();
-  }
-  return emptyAppData();
+/** Datos iniciales al registrar cualquier usuario. */
+export function initialDataForNewUser(): AppDataRecord {
+  return getSampleUserData();
 }

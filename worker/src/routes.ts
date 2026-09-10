@@ -8,7 +8,7 @@ import {
   verifyPassword,
 } from './crypto';
 import { error, json, readJson } from './http';
-import { ensureSeedUser, initialDataForEmail } from './seed';
+import { ensureSeedUser, initialDataForNewUser } from './seed';
 import {
   SESSION_DAYS,
   clearSessionCookie,
@@ -109,7 +109,7 @@ export async function handleApi(request: Request, env: Env): Promise<Response> {
           createdAt: now,
           updatedAt: now,
         },
-        initialDataForEmail(email, env.SEED_USER_EMAIL),
+        initialDataForNewUser(),
       );
     } catch (err) {
       if (err instanceof Error && err.message === 'EMAIL_TAKEN') {

@@ -2,40 +2,60 @@
   "version": 1,
   "panels": [
     {
-      "id": "soc-ordenadores",
-      "name": "Ordenadores del SOC",
-      "createdAt": "2026-09-09T00:00:00.000Z",
-      "updatedAt": "2026-09-09T00:00:00.000Z",
+      "id": "red-oficina-ejemplo",
+      "name": "Red oficina (ejemplo)",
+      "createdAt": "2026-09-10T00:00:00.000Z",
+      "updatedAt": "2026-09-10T00:00:00.000Z",
       "actions": [
         {
-          "id": "authenticator",
-          "name": "Authenticator",
-          "type": "url",
-          "value": "https://aka.ms/mfasetup",
-          "description": "Configuración de Microsoft Authenticator.",
-          "favorite": true,
-          "createdAt": "2026-09-09T00:00:00.000Z",
-          "updatedAt": "2026-09-09T00:00:00.000Z"
-        },
-        {
-          "id": "impresoras",
+          "id": "impresoras-oficina",
           "name": "Impresoras",
           "type": "network",
-          "value": "\\\\ps-bllul297-01",
-          "description": "Servidor de impresoras.",
+          "value": "\\\\NAS-OFICINA\\Impresoras",
+          "description": "Carpeta de red con las impresoras compartidas de la empresa.",
+          "favorite": true,
+          "createdAt": "2026-09-10T00:00:00.000Z",
+          "updatedAt": "2026-09-10T00:00:00.000Z"
+        },
+        {
+          "id": "archivos-compartidos",
+          "name": "Archivos compartidos",
+          "type": "network",
+          "value": "\\\\NAS-OFICINA\\Datos",
+          "description": "Servidor de archivos de la pequeña empresa (documentos comunes).",
           "favorite": false,
-          "createdAt": "2026-09-09T00:00:00.000Z",
-          "updatedAt": "2026-09-09T00:00:00.000Z"
+          "createdAt": "2026-09-10T00:00:00.000Z",
+          "updatedAt": "2026-09-10T00:00:00.000Z"
         },
         {
           "id": "adaptadores-de-red",
           "name": "Adaptadores de red",
           "type": "windows",
           "value": "ncpa.cpl",
-          "description": "Abrir configuración de adaptadores de red.",
+          "description": "Abrir la configuración de tarjetas de red en Windows.",
           "favorite": false,
-          "createdAt": "2026-09-09T00:00:00.000Z",
-          "updatedAt": "2026-09-09T00:00:00.000Z"
+          "createdAt": "2026-09-10T00:00:00.000Z",
+          "updatedAt": "2026-09-10T00:00:00.000Z"
+        },
+        {
+          "id": "impresoras-windows",
+          "name": "Panel de impresoras",
+          "type": "windows",
+          "value": "control printers",
+          "description": "Abrir el panel clásico de impresoras y faxes de Windows.",
+          "favorite": false,
+          "createdAt": "2026-09-10T00:00:00.000Z",
+          "updatedAt": "2026-09-10T00:00:00.000Z"
+        },
+        {
+          "id": "ver-ip",
+          "name": "Ver configuración IP",
+          "type": "cmd",
+          "value": "ipconfig /all",
+          "description": "Mostrar IP, puerta de enlace y DNS del equipo (útil en soporte de red).",
+          "favorite": false,
+          "createdAt": "2026-09-10T00:00:00.000Z",
+          "updatedAt": "2026-09-10T00:00:00.000Z"
         }
       ]
     }

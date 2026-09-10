@@ -1,0 +1,34 @@
+---
+description: Despliegue Cloudflare Pages+Worker y auth de usuarios con D1+JWT
+alwaysApply: true
+---
+
+# Cloudflare: Pages + Worker y usuarios con D1 + JWT
+
+## Despliegue
+
+Cuando el usuario pida desplegar, publicar o configurar hosting en Cloudflare:
+
+- Frontend estático/SPA → **Cloudflare Pages** (build a `dist/` u output equivalente)
+- API / backend / auth / bindings → **Cloudflare Worker aparte** (`worker/` + `wrangler`)
+- **NO** desplegar front+API como un único Worker con `assets` / static assets embebidos, salvo petición explícita
+- Seguir el patrón Pages + Worker del resto de apps del usuario
+- Si hace falta misma URL: proxy/ruta Pages→Worker o dominio custom; documentar CORS/cookies si hay orígenes distintos
+
+## Gestión de usuarios / autenticación
+
+Cuando el usuario pida login, registro, sesiones, cuentas, auth o gestión de usuarios:
+
+- Persistencia de usuarios y datos por usuario → **Cloudflare D1** (no R2 ni solo localStorage como fuente de verdad)
+- Autenticación → **JWT** (p. ej. HS256), en cookie HttpOnly y/o `Authorization: Bearer`
+- Contraseñas hasheadas (PBKDF2 u equivalente); nunca en claro
+- Multitenant: cada usuario solo lee/escribe sus propios datos (`user_id`)
+- API de auth en el **Worker** (`/api/auth/*`, etc.), no en el frontend estático
+
+## Ejemplos
+
+```text
+✅ Pages (frontend) + Worker (API) + D1 (users/user_data) + JWT
+❌ Worker monolítico con assets + auth en R2
+❌ Auth solo en localStorage sin D1/JWT (salvo prototipo explícito)
+```

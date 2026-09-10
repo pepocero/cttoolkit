@@ -15,7 +15,8 @@ Al arrancar la API se crea/actualiza (si no existe):
 
 - Email: `pepocero@gmail.com` (`SEED_USER_EMAIL`)
 - Contraseña: `SEED_USER_PASSWORD`
-- Paneles iniciales: `worker/src/seedData.json`
+- Paneles iniciales: panel de muestra **Red oficina (ejemplo)** (`worker/src/seedData.json`)
+- Todo usuario nuevo al registrarse recibe el mismo panel de muestra (5 acciones)
 
 ## Desarrollo local
 

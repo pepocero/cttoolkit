@@ -2,19 +2,19 @@
 
 ## Visión general
 
-CT Toolkit es una SPA (React + TypeScript + Vite) con API en **Cloudflare Worker**.
+CT Toolkit es una SPA (React + TypeScript + Vite) en **Cloudflare Pages**, con API en un **Cloudflare Worker** aparte.
 
-- Frontend: paneles, acciones, landing, login
-- Backend: autenticación **JWT** + persistencia en **Cloudflare D1**
+- Frontend (Pages): paneles, acciones, landing, login
+- Backend (Worker `ct-toolkit-api`): autenticación **JWT** + persistencia en **Cloudflare D1**
 - Cada usuario solo accede a sus propios datos (multitenant)
 
 ```
 ┌──────────────────────────────────────────────┐
 │                   Navegador                  │
-│  React UI  →  JWT (cookie/Bearer)  →  /api   │
+│  React (Pages)  →  Bearer JWT  →  Worker API │
 └───────────────────────┬──────────────────────┘
                         │
-              Cloudflare Worker
+              Cloudflare Worker (API)
                         │
                    Cloudflare D1
               (users + user_data)
@@ -25,7 +25,7 @@ CT Toolkit es una SPA (React + TypeScript + Vite) con API en **Cloudflare Worker
 - **React 19** + **TypeScript**
 - **Vite 8**
 - **Tailwind CSS 4** + CSS de producto
-- **Cloudflare Worker** + **D1**
+- **Cloudflare Pages** + **Worker** + **D1**
 - **JWT HS256** (Web Crypto)
 
 ## Estructura
@@ -53,8 +53,8 @@ public/landing/      # Imágenes de la landing
 
 `AuthProvider` + `AppProvider`:
 
-- Auth: sesión JWT vía cookie
-- Datos: carga/guarda `/api/data` con debounce
+- Auth: JWT en `localStorage` (`Authorization: Bearer`) y cookie HttpOnly en mismo origen
+- Datos: carga/guarda `/api/data` con debounce (`VITE_API_URL` en producción)
 - Migración opcional desde `localStorage` legado
 
 ## Persistencia (D1)

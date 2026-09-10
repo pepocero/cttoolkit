@@ -5,14 +5,59 @@ export interface AuthUser {
   email: string;
 }
 
+const TOKEN_KEY = 'ct-toolkit-jwt';
+
+export function getApiBaseUrl(): string {
+  const raw = import.meta.env.VITE_API_URL as string | undefined;
+  if (!raw || raw.trim() === '') return '';
+  return raw.replace(/\/+$/, '');
+}
+
+export function apiUrl(path: string): string {
+  const base = getApiBaseUrl();
+  const normalized = path.startsWith('/') ? path : `/${path}`;
+  return `${base}${normalized}`;
+}
+
+export function getStoredToken(): string | null {
+  try {
+    return localStorage.getItem(TOKEN_KEY);
+  } catch {
+    return null;
+  }
+}
+
+export function setStoredToken(token: string | null): void {
+  try {
+    if (!token) localStorage.removeItem(TOKEN_KEY);
+    else localStorage.setItem(TOKEN_KEY, token);
+  } catch {
+    // ignore
+  }
+}
+
+export interface AuthResponse {
+  user: AuthUser;
+  token?: string;
+  tokenType?: string;
+  expiresAt?: string;
+}
+
 async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
-  const response = await fetch(path, {
+  const headers = new Headers(init.headers);
+  if (!headers.has('Content-Type')) {
+    headers.set('Content-Type', 'application/json');
+  }
+
+  const token = getStoredToken();
+  if (token) {
+    headers.set('Authorization', `Bearer ${token}`);
+  }
+
+  const response = await fetch(apiUrl(path), {
     ...init,
     credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(init.headers ?? {}),
-    },
+    headers,
   });
 
   let payload: unknown = null;
@@ -37,14 +82,14 @@ async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
 }
 
 export function loginRequest(email: string, password: string) {
-  return api<{ user: AuthUser }>('/api/auth/login', {
+  return api<AuthResponse>('/api/auth/login', {
     method: 'POST',
     body: JSON.stringify({ email, password }),
   });
 }
 
 export function registerRequest(email: string, password: string) {
-  return api<{ user: AuthUser }>('/api/auth/register', {
+  return api<AuthResponse>('/api/auth/register', {
     method: 'POST',
     body: JSON.stringify({ email, password }),
   });

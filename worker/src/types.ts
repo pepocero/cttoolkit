@@ -1,10 +1,11 @@
 export interface Env {
   DB: D1Database;
-  ASSETS: Fetcher;
   AUTH_SECRET: string;
   SEED_USER_EMAIL: string;
   SEED_USER_PASSWORD: string;
   ALLOW_REGISTRATION: string;
+  /** Orígenes permitidos separados por coma (Pages + local). */
+  CORS_ORIGINS: string;
 }
 
 export interface UserAccount {

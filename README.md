@@ -102,7 +102,9 @@ npm run dev
 
 Abre `http://localhost:5173`.
 
-## Despliegue (Cloudflare Worker + D1)
+## Despliegue (Cloudflare Pages + Worker + D1)
+
+Arquitectura: **Pages** (frontend) + **Worker API** (`ct-toolkit-api`) + **D1**.
 
 ```bash
 npx wrangler d1 create ct-toolkit
@@ -111,8 +113,15 @@ npx wrangler d1 create ct-toolkit
 npx wrangler secret put AUTH_SECRET
 npx wrangler secret put SEED_USER_PASSWORD
 npm run db:migrate:remote
-npm run deploy
+
+# API
+npm run deploy:api
+
+# Frontend (ajusta VITE_API_URL en .env.production a la URL del Worker)
+npm run deploy:pages
 ```
+
+Tras crear el proyecto Pages, añade su origen a `CORS_ORIGINS` en `wrangler.jsonc` y vuelve a desplegar la API.
 
 Más detalle en [`docs/AUTH_D1.md`](docs/AUTH_D1.md).
 

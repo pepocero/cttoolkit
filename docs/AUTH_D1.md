@@ -1,13 +1,15 @@
 # Autenticación JWT y Cloudflare D1
 
-CT Toolkit usa un **Cloudflare Worker** + **D1** (SQLite) para usuarios y paneles, con autenticación **JWT HS256**.
+CT Toolkit usa **Cloudflare Pages** (frontend) + **Worker API** (`ct-toolkit-api`) + **D1** (SQLite), con autenticación **JWT HS256**.
 
 ## Modelo
 
 - Tabla `users`: id, email, password_hash, password_salt, fechas
 - Tabla `user_data`: paneles JSON por `user_id` (multitenant)
 - Login/registro emiten un **JWT** (`alg: HS256`) en cookie HttpOnly `ct_toolkit_jwt` y en el cuerpo (`token`)
-- Las rutas protegidas validan el JWT (cookie o `Authorization: Bearer …`)
+- El frontend en Pages guarda el `token` y lo envía como `Authorization: Bearer …` (necesario con orígenes distintos Pages/Worker)
+- Las rutas protegidas validan el JWT (cookie o Bearer)
+- CORS: `CORS_ORIGINS` + previews `*.ct-toolkit.pages.dev`
 
 ## Usuario semilla
 
@@ -36,7 +38,10 @@ npx wrangler d1 create ct-toolkit
 npx wrangler secret put AUTH_SECRET
 npx wrangler secret put SEED_USER_PASSWORD
 npm run db:migrate:remote
-npm run deploy
+npm run deploy:api
+# Ajusta .env.production → VITE_API_URL = URL del Worker
+npm run deploy:pages
+# Añade https://ct-toolkit.pages.dev (u origen custom) a CORS_ORIGINS y redeploy API
 ```
 
 ## API

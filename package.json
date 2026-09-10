@@ -11,7 +11,9 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "deploy": "npm run build && wrangler deploy",
+    "deploy:api": "wrangler deploy",
+    "deploy:pages": "npm run build && wrangler pages deploy dist --project-name=ct-toolkit --commit-dirty=true",
+    "deploy": "npm run deploy:api && npm run deploy:pages",
     "cf:typegen": "wrangler types"
   },
   "dependencies": {

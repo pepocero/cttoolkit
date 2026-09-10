@@ -8,10 +8,12 @@ import {
   type ReactNode,
 } from 'react';
 import {
+  getStoredToken,
   loginRequest,
   logoutRequest,
   meRequest,
   registerRequest,
+  setStoredToken,
   type AuthUser,
 } from '../services/apiClient';
 
@@ -36,9 +38,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let cancelled = false;
     (async () => {
       try {
+        if (!getStoredToken()) {
+          if (!cancelled) setUser(null);
+          return;
+        }
         const result = await meRequest();
         if (!cancelled) setUser(result.user);
       } catch {
+        setStoredToken(null);
         if (!cancelled) setUser(null);
       } finally {
         if (!cancelled) setLoading(false);
@@ -52,12 +59,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = useCallback(async (email: string, password: string) => {
     setError(null);
     const result = await loginRequest(email, password);
+    if (result.token) setStoredToken(result.token);
     setUser(result.user);
   }, []);
 
   const register = useCallback(async (email: string, password: string) => {
     setError(null);
     const result = await registerRequest(email, password);
+    if (result.token) setStoredToken(result.token);
     setUser(result.user);
   }, []);
 
@@ -66,6 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await logoutRequest();
     } finally {
+      setStoredToken(null);
       setUser(null);
     }
   }, []);
